@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SlideCast Studio</title>
+
+  <!-- EXTERNAL LIBRARIES (Required for Slides) -->
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Roboto Flex & Source Code Pro -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;600;700;900&family=Roboto+Flex:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+
+  <!-- html2canvas Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <!-- App Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+
+  <style>
+    /* --- DESIGN TOKENS --- */
+    :root {
+      --bg-app: #09090b;
+      --bg-panel: #0f1117;
+      --bg-card: #161b22;
+      --bg-input: #21262d;
+      --accent-primary: #3b82f6;
+      --accent-glow: rgba(59, 130, 246, 0.3);
+      --accent-gradient: linear-gradient(135deg, #3b82f6, #6366f1);
+      --text-main: #f0f6fc;
+      --text-secondary: #8b949e;
+      --text-muted: #6e7681;
+      --border: #30363d;
+      --border-focus: #58a6ff;
+      --glass-bg: rgba(22, 27, 34, 0.7);
+      --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+      --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.2);
+      --success: #2ea043;
+      --warning: #d29922;
+      --danger: #f85149;
+      --font-ui: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    /* Reset Material Icons width for the app UI */
+    .material-icons {
+      width: 1em;
+    }
+
+    .material-icons {
+      direction: rtl;
+    }
+
+    * {
+      box-sizing: border-box;
+      outline: none;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-app);
+      color: var(--text-main);
+      font-family: var(--font-ui);
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+      background-image: radial-gradient(var(--border) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+
+    /* --- SCROLLBAR --- */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #30363d;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #8b949e;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    /* --- SIDEBAR --- */
+    #sidebar {
+      width: 240px;
+      background: rgba(15, 17, 23, 0.95);
+      backdrop-filter: blur(10px);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      z-index: 20;
+    }
+
+    .brand {
+      padding: 0 0 30px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--accent-gradient);
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      color: white;
+      box-shadow: var(--shadow-glow);
+    }
+
+    .brand-text {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #fff;
+      letter-spacing: -0.5px;
+    }
+
+    .nav-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .nav-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 12px 12px 8px;
+      margin-top: 16px;
+    }
+
+    .nav-item {
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .nav-item:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+      color: var(--text-main);
+    }
+
+    .nav-item.active {
+      background-color: rgba(59, 130, 246, 0.15);
+      color: var(--accent-primary);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .nav-item svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+    }
+
+    /* --- MAIN CONTENT --- */
+    #main-content {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .view-section {
+      display: none;
+      flex-direction: column;
+      height: 100%;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .view-section.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* --- UI ELEMENTS --- */
+    .btn {
+      background: var(--bg-input);
+      color: var(--text-main);
+      border: 1px solid var(--border);
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+      font-family: var(--font-ui);
+    }
+
+    .btn:hover {
+      background: var(--border);
+      border-color: var(--text-secondary);
+      transform: translateY(-1px);
+    }
+
+    .btn.primary {
+      background: var(--accent-gradient);
+      color: white;
+      border: 1px solid transparent;
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+    }
+
+    .btn.primary:hover {
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-icon {
+      padding: 8px;
+      border-radius: 6px;
+      color: var(--text-secondary);
+      border: 1px solid transparent;
+      background: transparent;
+    }
+
+    .btn-icon:hover {
+      color: var(--danger);
+      background: rgba(248, 81, 73, 0.1);
+    }
+
+    /* --- DASHBOARD --- */
+    .dashboard-header {
+      padding: 24px 32px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(9, 9, 11, 0.5);
+    }
+
+    .dashboard-content {
+      padding: 32px;
+      flex-grow: 1;
+      overflow-y: auto;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 24px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s;
+      position: relative;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: var(--text-secondary);
+      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+    }
+
+    .card-thumb {
+      height: 160px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      background-color: #000;
+    }
+
+    .card-thumb::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+    }
+
+    .card-body {
+      padding: 16px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      z-index: 1;
+      background: var(--bg-card);
+    }
+
+    .card-title {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .card-meta {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: auto;
+    }
+
+    .card-actions .btn {
+      flex: 1;
+      justify-content: center;
+      font-size: 0.85rem;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+    }
+
+    .status-done {
+      background-color: var(--success);
+      box-shadow: 0 0 8px rgba(46, 160, 67, 0.4);
+    }
+
+    .status-pending {
+      background-color: var(--warning);
+      box-shadow: 0 0 8px rgba(210, 153, 34, 0.4);
+    }
+
+    /* --- PLAYER (FULL SCREEN) --- */
+    #player-stage {
+      flex-grow: 1;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
+      padding: 0;
+    }
+
+    #slide-wrapper {
+      width: 100%;
+      height: 100%;
+      background: white;
+      box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.6);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #slide-content {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* FORCE SLIDE TO FILL SCREEN */
+    #slide-content .ppt-slide,
+    #render-sandbox .ppt-slide {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 100% !important;
+      max-width: 100% !important;
+    }
+
+    .slide-transition-enter {
+      animation: slideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .slide-transition-exit {
+      animation: slideOut 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes slideOut {
+      from {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      to {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+    }
+
+    #controls-bar {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      padding: 12px 28px;
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s;
+      transform: translateX(-50%) translateY(10px);
+    }
+
+    #player-stage:hover #controls-bar {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .control-btn {
+      background: transparent;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 1.2rem;
+      opacity: 0.9;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .control-btn:hover {
+      opacity: 1;
+      transform: scale(1.1);
+      color: var(--accent-primary);
+    }
+
+    #play-btn {
+      width: 40px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+    }
+
+    #play-btn:hover {
+      background: var(--accent-primary);
+      color: white;
+    }
+
+    .timeline-container {
+      width: 300px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+      cursor: pointer;
+      position: relative;
+      transition: height 0.2s;
+    }
+
+    .timeline-container:hover {
+      height: 8px;
+    }
+
+    .timeline-fill {
+      height: 100%;
+      background: var(--accent-primary);
+      border-radius: 4px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 0%;
+      box-shadow: 0 0 10px var(--accent-primary);
+    }
+
+    .timeline-thumb {
+      width: 16px;
+      height: 16px;
+      background: white;
+      border-radius: 50%;
+      position: absolute;
+      top: 50%;
+      margin-top: -8px;
+      left: 0%;
+      margin-left: -8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      transition: transform 0.1s;
+    }
+
+    .timeline-container:hover .timeline-thumb {
+      transform: scale(1.2);
+    }
+
+    #time-display {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.7);
+      width: 60px;
+      text-align: right;
+    }
+
+    /* --- RENDERER --- */
+    .renderer-layout {
+      display: flex;
+      height: 100%;
+    }
+
+    .renderer-sidebar {
+      width: 320px;
+      background: var(--bg-panel);
+      border-right: 1px solid var(--border);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      z-index: 10;
+    }
+
+    .renderer-stage {
+      flex: 1;
+      background: #050505;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .control-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .form-select {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      color: white;
+      padding: 12px;
+      border-radius: 6px;
+      font-family: var(--font-ui);
+      transition: 0.2s;
+      cursor: pointer;
+    }
+
+    .form-select:focus {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    }
+
+    .monitor-container {
+      position: relative;
+      box-shadow: 0 0 60px rgba(0, 0, 0, 0.8);
+      border: 1px solid #333;
+      border-radius: 4px;
+      overflow: hidden;
+      background: #000;
+      max-width: 95%;
+      max-height: 80vh;
+      display: flex;
+    }
+
+    #live-render-canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .monitor-status {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      border: 1px solid var(--border);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .rec-dot {
+      width: 10px;
+      height: 10px;
+      background: #f85149;
+      border-radius: 50%;
+      animation: blink 1s infinite;
+      display: none;
+    }
+
+    .rec-dot.active {
+      display: block;
+    }
+
+    @keyframes blink {
+      50% {
+        opacity: 0;
+      }
+    }
+
+    .console-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 180px;
+      background: rgba(13, 17, 23, 0.95);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--border);
+      padding: 16px 24px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: #c9d1d9;
+      overflow-y: auto;
+      transition: transform 0.3s;
+    }
+
+    .console-overlay.hidden {
+      transform: translateY(100%);
+    }
+
+    .console-toggle {
+      position: absolute;
+      bottom: 180px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 4px 12px;
+      border-radius: 12px 12px 0 0;
+      font-size: 0.75rem;
+      cursor: pointer;
+      color: var(--text-secondary);
+    }
+
+    .console-toggle:hover {
+      color: white;
+      background: var(--border);
+    }
+
+    .log-entry {
+      margin-bottom: 6px;
+      line-height: 1.4;
+      word-break: break-all;
+    }
+
+    .log-success {
+      color: #3fb950;
+    }
+
+    .log-process {
+      color: #58a6ff;
+    }
+
+    .log-error {
+      color: #f85149;
+    }
+
+    .batch-console {
+      display: none;
+      height: 100%;
+      flex-direction: column;
+    }
+
+    .batch-console.active {
+      display: flex;
+    }
+
+    /* --- TOAST & MODAL --- */
+    #toast {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 16px 24px;
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transform: translateY(100px);
+      transition: transform 0.4s;
+      z-index: 2000;
+      font-weight: 500;
+      color: white;
+    }
+
+    #toast.visible {
+      transform: translateY(0);
+    }
+
+    #toast-icon {
+      color: var(--success);
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 3000;
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      width: 400px;
+      max-width: 90%;
+      box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.6);
+      animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes modalPop {
+      from {
+        transform: scale(0.9);
+        opacity: 0;
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #fff;
+    }
+
+    .modal-body {
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+      line-height: 1.5;
+      font-size: 0.95rem;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* --- OFFSCREEN RENDERING CONTAINER --- */
+    #render-sandbox {
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+      pointer-events: none;
+      background: transparent;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- SIDEBAR -->
+  <nav id="sidebar">
+    <div class="brand">
+      <div class="brand-icon"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="3"
+          fill="none">
+          <polygon points="5 3 19 12 5 21 5 3"></polygon>
+        </svg></div>
+      <span class="brand-text">SlideCast</span>
+    </div>
+    <div class="nav-group">
+      <div class="nav-label">Main</div>
+      <div class="nav-item active" onclick="app.navigate('dashboard')" id="nav-dashboard"><svg viewBox="0 0 24 24">
+          <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+          <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+          <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+          <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+        </svg>Library</div>
+      <div class="nav-item" onclick="app.navigate('player')" id="nav-player"><svg viewBox="0 0 24 24">
+          <polygon points="5 3 19 12 5 21 5 3"></polygon>
+        </svg>Player</div>
+      <div class="nav-label">Production</div>
+      <div class="nav-item" onclick="app.navigate('renderer')" id="nav-renderer"><svg viewBox="0 0 24 24">
+          <polygon points="23 7 16 12 23 17 23 7"></polygon>
+          <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+        </svg>Renderer</div>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main id="main-content">
+
+    <!-- DASHBOARD VIEW -->
+    <section id="view-dashboard" class="view-section active">
+      <div class="dashboard-header">
+        <div>
+          <h2 style="margin:0; font-size:1.5rem; letter-spacing:-0.5px;">Project Library</h2>
+          <p style="margin:4px 0 0; color:var(--text-secondary); font-size:0.9rem;">Manage your decks and outputs.</p>
+        </div>
+        <div style="display:flex; gap:12px;">
+          <button class="btn" onclick="document.getElementById('folder-input').click()">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            Import
+          </button>
+          <button class="btn primary" onclick="batchManager.renderAll()">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2v4"></path>
+              <path d="M12 18v4"></path>
+              <path d="M4.93 4.93l2.83 2.83"></path>
+              <path d="M16.24 16.24l2.83 2.83"></path>
+              <path d="M2 12h4"></path>
+              <path d="M18 12h4"></path>
+              <path d="M4.93 19.07l2.83-2.83"></path>
+              <path d="M16.24 7.76l2.83-2.83"></path>
+            </svg>
+            Batch Render
+          </button>
+        </div>
+      </div>
+      <div class="dashboard-content">
+        <div class="grid" id="library-grid"></div>
+        <input type="file" id="folder-input" webkitdirectory directory multiple style="display: none;"
+          onchange="app.processFolder(this)">
+      </div>
+    </section>
+
+    <!-- PLAYER VIEW -->
+    <section id="view-player" class="view-section">
+      <div id="player-container" style="height: 100%;">
+        <div id="player-stage">
+          <div id="slide-wrapper">
+            <div id="slide-content"></div>
+          </div>
+          <div id="controls-bar">
+            <button class="control-btn" onclick="player.prev()"><svg viewBox="0 0 24 24" width="24" height="24"
+                fill="currentColor">
+                <path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z"></path>
+              </svg></button>
+            <button class="control-btn" id="play-btn" onclick="player.togglePlay()">
+              <svg id="icon-play" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+              <svg id="icon-pause" viewBox="0 0 24 24" width="24" height="24" fill="currentColor" style="display:none;">
+                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+              </svg>
+            </button>
+            <button class="control-btn" onclick="player.next()"><svg viewBox="0 0 24 24" width="24" height="24"
+                fill="currentColor">
+                <path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"></path>
+              </svg></button>
+            <div style="width: 1px; height: 24px; background: rgba(255,255,255,0.15); margin: 0 8px;"></div>
+            <div class="timeline-container" onclick="player.scrub(event)">
+              <div class="timeline-fill" id="timeline-fill"></div>
+              <div class="timeline-thumb" id="timeline-thumb"></div>
+            </div>
+            <div id="time-display">0 / 0</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RENDERER VIEW (STUDIO LAYOUT) -->
+    <section id="view-renderer" class="view-section">
+      <div class="renderer-layout">
+        <!-- Left Sidebar: Controls -->
+        <aside class="renderer-sidebar">
+          <h2 style="margin:0; font-size:1.2rem; color:#fff;">Render Engine</h2>
+
+          <div class="control-group">
+            <label class="form-label">Project</label>
+            <select id="render-source" class="form-select" onchange="renderer.loadPreview()">
+              <option value="">Select Project...</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label class="form-label">Resolution</label>
+            <select id="render-res" class="form-select">
+              <option value="1280x720">720p (HD)</option>
+              <option value="1920x1080">1080p (FHD)</option>
+            </select>
+          </div>
+
+          <div style="margin-top:auto;">
+            <button id="btn-render-start" class="btn primary"
+              style="width:100%; justify-content: center; padding: 12px; font-size:1rem;"
+              onclick="renderer.startRender()">
+              Start Render
+            </button>
+            <div id="render-status"
+              style="text-align:center; margin-top:12px; font-size:0.85rem; color:var(--text-secondary);">READY</div>
+          </div>
+        </aside>
+
+        <!-- Main Stage: Monitor -->
+        <main class="renderer-stage">
+          <div class="monitor-container">
+            <canvas id="live-render-canvas"></canvas>
+            <div class="monitor-status">
+              <div class="rec-dot" id="rec-dot"></div>
+              <span id="monitor-text">LIVE PREVIEW</span>
+            </div>
+          </div>
+
+          <div class="console-toggle" onclick="document.querySelector('.console-overlay').classList.toggle('hidden')">
+            <span id="console-toggle-text">Hide Console</span>
+          </div>
+
+          <div class="console-overlay" id="console-log">
+            <div id="standard-log">
+              <div class="log-entry"><span style="color:var(--text-muted)">[SYSTEM]</span> Engine initialized. Select a
+                project.</div>
+            </div>
+            <div id="batch-log" class="batch-console">
+              <div class="log-entry"><span style="color:var(--text-muted)">[BATCH]</span> Queue initialized.</div>
+              <div id="batch-entries" style="flex:1; overflow-y:auto;"></div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- TOAST & UTILS -->
+  <div id="toast">
+    <div id="toast-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg></div><span id="toast-msg">Operation Successful</span>
+  </div>
+  <canvas id="render-canvas" style="display:none"></canvas>
+  <div id="render-sandbox"></div>
+  <div class="modal-overlay" id="confirm-modal">
+    <div class="modal-box">
+      <div class="modal-title" id="modal-title">Confirm Action</div>
+      <div class="modal-body" id="modal-body">Are you sure you want to proceed?</div>
+      <div class="modal-actions"><button class="btn" onclick="modal.close()">Cancel</button><button class="btn danger"
+          id="modal-confirm-btn">Confirm</button></div>
+    </div>
+  </div>
+
+  <script>
+    const modal = {
+      show: (title, message, onConfirm) => {
+        document.getElementById('modal-title').innerText = title;
+        document.getElementById('modal-body').innerText = message;
+        const overlay = document.getElementById('confirm-modal');
+        const btn = document.getElementById('modal-confirm-btn');
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+        newBtn.addEventListener('click', () => { onConfirm(); modal.close(); });
+        overlay.classList.add('active');
+      },
+      close: () => { document.getElementById('confirm-modal').classList.remove('active'); }
+    };
+
+    const app = {
+      data: [], currentProject: null,
+      init: function () {
+        this.fetchManifest();
+        document.addEventListener('keydown', (e) => {
+          if (this.currentProject && document.getElementById('view-player').classList.contains('active'))
+          {
+            if (e.key === 'ArrowRight') player.next();
+            if (e.key === 'ArrowLeft') player.prev();
+            if (e.code === 'Space') player.togglePlay();
+          }
+        });
+      },
+      navigate: function (v) {
+        document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active'));
+        document.getElementById('view-' + v).classList.add('active');
+        document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'));
+        document.getElementById('nav-' + v).classList.add('active');
+        if (v === 'renderer') this.populateRendererSelect();
+      },
+      fetchManifest: async function () {
+        try
+        {
+          const response = await fetch('/api/manifest');
+          if (!response.ok) throw new Error("Backend error");
+          this.data = await response.json();
+          this.renderLibrary();
+        } catch (error)
+        {
+          document.getElementById('library-grid').innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 60px; background: var(--bg-card); border: 1px dashed var(--border); border-radius: 12px;"><h3 style="color: var(--text-secondary)">Connection Failed</h3><p style="color: var(--text-muted)">Ensure Python server is running on port 5000.</p></div>`;
+        }
+      },
+      renderLibrary: function () {
+        const grid = document.getElementById('library-grid');
+        grid.innerHTML = '';
+        if (this.data.length === 0) return grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 40px;">No projects found. Import a folder to start.</div>';
+        this.data.forEach(p => {
+          const isDone = p.status === 'done';
+          const statusClass = isDone ? 'status-done' : 'status-pending';
+          const btnText = isDone ? 'Download' : 'Render';
+          const action = isDone ? `window.location.href='/presentations/${p.id}/${p.id}.mp4'` : `renderer.selectAndRender('${p.id}')`;
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+                <div class="card-thumb" style="background-image: url('https://picsum.photos/seed/${p.id}/400/300');">
+                    <div class="card-badge"><span class="status-dot ${statusClass}"></span>${isDone ? 'Ready' : 'Pending'}</div>
+                </div>
+                <div class="card-body">
+                    <div class="card-title">${p.title}</div>
+                    <div class="card-meta"><span>${p.date}</span><span>${p.slide_count} slides</span></div>
+                    <div class="card-actions">
+                        <button class="btn" onclick="player.openPres('${p.id}')">Play</button>
+                        <button class="btn primary" onclick="${action}">${btnText}</button>
+                    </div>
+                    <button class="btn-icon" style="position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.5); border-radius:50%; width:32px; height:32px;" onclick="app.deleteProject('${p.id}', '${p.title}')" title="Delete Project">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    </button>
+                </div>`;
+          grid.appendChild(card);
+        });
+      },
+      deleteProject: function (id, title) {
+        modal.show("Delete Project", `Are you sure you want to permanently delete "${title}"?`, async () => {
+          try
+          {
+            const res = await fetch(`/api/project/${id}`, { method: 'DELETE' });
+            if (res.ok) { app.showToast("Project deleted"); app.fetchManifest(); }
+            else app.showToast("Failed to delete");
+          } catch (e) { app.showToast("Error: " + e.message); }
+        });
+      },
+      processFolder: async function (input) {
+        if (input.files.length === 0) return;
+        const formData = new FormData();
+        input.files.forEach(file => formData.append('files', file));
+        try
+        {
+          this.showToast("Uploading...");
+          const response = await fetch('/api/upload_folder', { method: 'POST', body: formData });
+          const result = await response.json();
+          if (result.status === 'success') { this.showToast(result.message); this.fetchManifest(); }
+          else this.showToast("Error: " + result.error);
+        } catch (e) { this.showToast("Upload failed: " + e.message); }
+      },
+      populateRendererSelect: function () {
+        const sel = document.getElementById('render-source');
+        sel.innerHTML = '<option value="">Select Project...</option>';
+        this.data.forEach(p => sel.innerHTML += `<option value="${p.id}">${p.title}</option>`);
+      },
+      showToast: function (m) {
+        const t = document.getElementById('toast');
+        document.getElementById('toast-msg').innerText = m;
+        t.classList.add('visible');
+        setTimeout(() => t.classList.remove('visible'), 3000);
+      }
+    };
+
+    const player = {
+      slides: [], index: 0, isPlaying: false, synth: window.speechSynthesis, isFirstLoad: true,
+      openPres: async function (id) {
+        try
+        {
+          const res = await fetch(`/api/project/${id}/slides`);
+          const data = await res.json();
+          this.slides = data.slides;
+          app.currentProject = data;
+          app.navigate('player');
+          this.index = 0;
+          this.isFirstLoad = true;
+          this.loadSlideIndex(0);
+        } catch (e) { app.showToast("Failed to load"); }
+      },
+      loadSlideIndex: function (idx) {
+        if (idx < 0 || idx >= this.slides.length) return;
+        this.index = idx;
+        const s = this.slides[ idx ];
+        const el = document.getElementById('slide-content');
+
+        // FIX: Handle Relative Paths for Player
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = s.html;
+        const images = tempDiv.querySelectorAll('img');
+        images.forEach(img => {
+          const src = img.getAttribute('src');
+          if (src && !src.startsWith('http') && !src.startsWith('/'))
+          {
+            if (app.currentProject && app.currentProject.id)
+            {
+              img.setAttribute('src', `/presentations/${app.currentProject.id}/${src}`);
+            }
+          }
+        });
+        const fixedHtml = tempDiv.innerHTML;
+        // ----------------------------------------------
+
+        if (!this.isFirstLoad)
+        {
+          el.classList.remove('slide-transition-enter');
+          el.classList.add('slide-transition-exit');
+          setTimeout(() => { el.innerHTML = fixedHtml; el.classList.remove('slide-transition-exit'); el.classList.add('slide-transition-enter'); }, 480);
+        } else
+        {
+          el.innerHTML = fixedHtml;
+          this.isFirstLoad = false;
+          el.classList.add('slide-transition-enter');
+        }
+        this.updateTimeline();
+      },
+      next: function () { if (this.index < this.slides.length - 1) { this.index++; this.loadSlideIndex(this.index); if (this.isPlaying) this.play(); } else { this.stop(); this.isPlaying = false; this.updatePlayBtn(); } },
+      prev: function () { if (this.index > 0) { this.index--; this.loadSlideIndex(this.index); if (this.isPlaying) this.play(); } },
+      togglePlay: function () { this.isPlaying = !this.isPlaying; this.updatePlayBtn(); if (this.isPlaying) this.play(); else this.stop(); },
+      play: function () {
+        this.synth.cancel();
+        const div = document.createElement('div'); div.innerHTML = this.slides[ this.index ].html;
+        const text = this.slides[ this.index ].script || div.innerText || div.textContent;
+        if (!text) return this.next();
+        const u = new SpeechSynthesisUtterance(text); u.rate = 1.0; u.pitch = 1.0;
+        u.onend = () => { if (this.isPlaying) this.next(); };
+        this.synth.speak(u);
+      },
+      stop: function () { this.synth.cancel(); },
+      updatePlayBtn: function () {
+        document.getElementById('icon-play').style.display = this.isPlaying ? 'none' : 'block';
+        document.getElementById('icon-pause').style.display = this.isPlaying ? 'block' : 'none';
+      },
+      updateTimeline: function () {
+        const pct = this.slides.length > 1 ? (this.index / (this.slides.length - 1)) * 100 : 0;
+        document.getElementById('timeline-fill').style.width = pct + '%';
+        document.getElementById('timeline-thumb').style.left = pct + '%';
+        document.getElementById('time-display').innerText = `${this.index + 1} / ${this.slides.length}`;
+      },
+      scrub: function (e) {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+        this.index = Math.floor(pct * (this.slides.length - 1));
+        this.loadSlideIndex(this.index);
+        if (this.isPlaying) this.play();
+      }
+    };
+
+    const batchManager = {
+      queue: [], isProcessing: false, abortController: null,
+      renderAll: function () {
+        const ids = app.data.filter(p => p.status === 'not done').map(p => p.id);
+        if (ids.length === 0) return app.showToast("All projects rendered.");
+        modal.show("Batch Render", `Render ${ids.length} pending projects?`, () => this.startBatch(ids));
+      },
+      startBatch: async function (ids) {
+        this.queue = ids; this.isProcessing = true; this.abortController = new AbortController();
+        document.getElementById('standard-log').style.display = 'none';
+        document.getElementById('batch-log').classList.add('active');
+        document.getElementById('console-toggle-text').innerText = 'Hide Batch Queue';
+        const batchEntries = document.getElementById('batch-entries');
+        batchEntries.innerHTML = `<div class="log-entry">>> Initializing Batch...</div>`;
+        app.navigate('renderer');
+        try
+        {
+          for (let i = 0; i < this.queue.length; i++)
+          {
+            if (!this.isProcessing) break;
+            const pid = this.queue[ i ]; const p = app.data.find(x => x.id === pid);
+            batchEntries.innerHTML += `<div class="log-entry">[${i + 1}/${ids.length}] Processing <b>${p.title}</b>...</div>`;
+            await renderer.startRender(pid, true);
+            batchEntries.innerHTML += `<div class="log-entry log-success">[${i + 1}/${ids.length}] Completed.</div>`;
+          }
+          batchEntries.innerHTML += `<div class="log-entry log-success">>> Batch Finished.</div>`;
+        } catch (e) { batchEntries.innerHTML += `<div class="log-entry log-error">>> Aborted.</div>`; }
+        finally
+        {
+          this.isProcessing = false;
+          document.getElementById('console-toggle-text').innerText = 'Show Console';
+        }
+      },
+      stopBatch: function () {
+        if (this.isProcessing) { this.isProcessing = false; if (this.abortController) this.abortController.abort(); }
+      }
+    };
+
+    const renderer = {
+      canvas: null, ctx: null,
+
+      getSupportedMimeType: function () {
+        const types = [
+          'video/webm;codecs=vp9,opus',
+          'video/webm;codecs=vp8,opus',
+          'video/webm',
+          'video/mp4'
+        ];
+        for (const type of types)
+        {
+          if (MediaRecorder.isTypeSupported(type))
+          {
+            return type;
+          }
+        }
+        return '';
+      },
+
+      log: function (msg, type = '') {
+        const logContainer = document.getElementById('batch-log').classList.contains('active') ? document.getElementById('batch-entries') : document.getElementById('standard-log');
+        const entry = document.createElement('div');
+        entry.className = `log-entry ${type}`;
+        entry.innerHTML = `> ${msg}`;
+        logContainer.appendChild(entry);
+        const overlay = document.querySelector('.console-overlay');
+        overlay.scrollTop = overlay.scrollHeight;
+      },
+
+      waitForImages: function (container) {
+        const images = container.getElementsByTagName('img');
+        const promises = Array.from(images).map(img => {
+          if (img.complete) return Promise.resolve();
+          return new Promise(resolve => {
+            img.onload = resolve;
+            img.onerror = resolve;
+          });
+        });
+        return Promise.all(promises);
+      },
+
+      loadPreview: function () {
+        const id = document.getElementById('render-source').value;
+        const c = document.getElementById('live-render-canvas');
+        const ctx = c.getContext('2d');
+        c.width = 480; c.height = 270;
+        ctx.fillStyle = '#000'; ctx.fillRect(0, 0, 480, 270);
+        ctx.fillStyle = '#333'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.font = "16px Inter";
+        ctx.fillText("Preview Ready", 240, 135);
+      },
+      selectAndRender: function (id) {
+        app.navigate('renderer');
+        document.getElementById('render-source').value = id;
+        this.loadPreview();
+      },
+      startRender: async function (projectId = null, isBatch = false) {
+        let pid = projectId;
+        if (!pid && !isBatch) { pid = document.getElementById('render-source').value; }
+        if (!pid) { if (!isBatch) this.log("Error: No project selected.", "log-error"); return; }
+
+        let p = app.data.find(x => x.id === pid);
+        if (!p && !isBatch) { try { const r = await fetch(`/api/project/${pid}/slides`); p = await r.json(); } catch (e) { this.log("Failed to load project data", "log-error"); return; } }
+        if (!p) { if (!isBatch) this.log("Project not found.", "log-error"); return; }
+
+        const res = document.getElementById('render-res').value.split('x');
+        const w = parseInt(res[ 0 ]), h = parseInt(res[ 1 ]);
+
+        if (!isBatch)
+        {
+          const c = document.getElementById('live-render-canvas');
+          c.width = w; c.height = h;
+        }
+
+        const c = document.getElementById('render-canvas'); c.width = w; c.height = h;
+        const ctx = c.getContext('2d');
+
+        let stream;
+        try { stream = c.captureStream(30); } catch (e) { this.log("Browser does not support captureStream.", "log-error"); return; }
+
+        const mimeType = this.getSupportedMimeType();
+        if (!mimeType) { this.log("Browser does not support MediaRecorder.", "log-error"); return; }
+
+        const rec = new MediaRecorder(stream, { mimeType: mimeType });
+        const chunks = [];
+        rec.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+
+        rec.onstop = async () => {
+          const blob = new Blob(chunks, { type: mimeType });
+
+          // Check for empty blob
+          if (blob.size === 0)
+          {
+            this.log("Error: Captured video is empty (0 bytes).", "log-error");
+            if (!isBatch)
+            {
+              document.getElementById('btn-render-start').disabled = false;
+              document.getElementById('render-status').innerText = "FAILED";
+              document.getElementById('render-status').style.color = "var(--danger)";
+              document.getElementById('rec-dot').classList.remove('active');
+              document.getElementById('monitor-text').innerText = "ERROR";
+            }
+            return;
+          }
+
+          const formData = new FormData();
+          formData.append('video', blob, `${pid}.mp4`);
+
+          if (!isBatch)
+          {
+            try
+            {
+              this.log("Converting to MP4 and uploading...");
+              const r = await fetch(`/api/render/${pid}`, { method: 'POST', body: formData });
+
+              if (r.ok)
+              {
+                app.showToast("Render Complete & Converted to MP4");
+                app.fetchManifest();
+              } else
+              {
+                // FIX: Read the actual error from server (e.g., 413 Payload Too Large)
+                let serverError = "Server rejected upload";
+                try
+                {
+                  const errData = await r.json();
+                  if (errData.error) serverError = errData.error;
+                } catch (e) { /* ignore JSON parse error */ }
+
+                throw new Error(serverError);
+              }
+            } catch (e)
+            {
+              this.log("Upload failed: " + e.message, "log-error");
+              this.log("Downloading video locally as fallback...", "log-process");
+              const a = document.createElement('a');
+              a.href = URL.createObjectURL(blob);
+              a.download = `${pid}.mp4`;
+              a.click();
+            }
+            document.getElementById('btn-render-start').disabled = false;
+            document.getElementById('render-status').innerText = "DONE (Local)";
+            document.getElementById('render-status').style.color = "var(--warning)";
+            document.getElementById('rec-dot').classList.remove('active');
+            document.getElementById('monitor-text').innerText = "LOCAL FILE";
+          } else
+          {
+            const r = await fetch(`/api/render/${pid}`, { method: 'POST', body: formData });
+            if (!r.ok)
+            {
+              let serverError = "Upload failed";
+              try { const errData = await r.json(); if (errData.error) serverError = errData.error; } catch (e) { }
+              this.log(`Batch Item Error: ${serverError}`, "log-error");
+            }
+          }
+        };
+
+        rec.start();
+
+        if (!isBatch)
+        {
+          document.getElementById('btn-render-start').disabled = true;
+          document.getElementById('render-status').innerText = "RECORDING...";
+          document.getElementById('render-status').style.color = "var(--warning)";
+          document.getElementById('rec-dot').classList.add('active');
+          document.getElementById('monitor-text').innerText = "REC " + (w + "x" + h);
+          this.log(`Rendering ${p.title || pid} @ ${w}x${h}...`);
+        }
+
+        let slides = p.slides || [];
+        if (!slides.length && !isBatch) { const r = await fetch(`/api/project/${pid}/slides`); const d = await r.json(); slides = d.slides; }
+
+        // Check for empty slides
+        if (!slides || slides.length === 0)
+        {
+          this.log("Error: No slides found in project.", "log-error");
+          rec.stop();
+          return;
+        }
+
+        const sandbox = document.getElementById('render-sandbox');
+        sandbox.style.width = w + 'px';
+        sandbox.style.height = h + 'px';
+
+        for (let i = 0; i < slides.length; i++)
+        {
+          if (isBatch && batchManager.abortController?.signal.aborted) { rec.stop(); throw new Error("Aborted"); }
+          const s = slides[ i ];
+          if (!isBatch) this.log(`Rendering Slide ${i + 1}/${slides.length}`);
+
+          sandbox.innerHTML = s.html;
+
+          // Fix Relative Paths
+          const images = sandbox.querySelectorAll('img');
+          images.forEach(img => {
+            const src = img.getAttribute('src');
+            if (src && !src.startsWith('http') && !src.startsWith('/'))
+            {
+              img.setAttribute('src', `/presentations/${pid}/${src}`);
+            }
+          });
+
+          // Force Slide Dimensions
+          const slideDiv = sandbox.querySelector('.ppt-slide');
+          if (slideDiv)
+          {
+            slideDiv.style.width = '100%';
+            slideDiv.style.height = '100%';
+            slideDiv.style.minHeight = '100%';
+          }
+
+          await this.waitForImages(sandbox);
+          await new Promise(r => setTimeout(r, 100));
+
+          try
+          {
+            const canvasShot = await html2canvas(sandbox, {
+              width: w,
+              height: h,
+              useCORS: false,
+              allowTaint: true,
+              scale: 1,
+              backgroundColor: null
+            });
+
+            ctx.clearRect(0, 0, w, h);
+            ctx.drawImage(canvasShot, 0, 0);
+
+            if (!isBatch)
+            {
+              const liveCanvas = document.getElementById('live-render-canvas');
+              const liveCtx = liveCanvas.getContext('2d');
+              liveCtx.clearRect(0, 0, liveCanvas.width, liveCanvas.height);
+              liveCtx.drawImage(canvasShot, 0, 0, liveCanvas.width, liveCanvas.height);
+            }
+
+            for (let f = 0; f < 60; f++)
+            {
+              if (isBatch && batchManager.abortController?.signal.aborted) throw new Error("Aborted");
+              await new Promise(r => requestAnimationFrame(r));
+            }
+          } catch (err)
+          {
+            console.error(err);
+            this.log(`Error rendering slide ${i + 1}: ${err.message}`, "log-error");
+          }
+        }
+        rec.stop();
+      }
+    };
+
+    window.onload = () => app.init();
+  </script>
+</body>
+
+</html>

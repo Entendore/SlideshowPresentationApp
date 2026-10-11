@@ -1,0 +1,40 @@
+{
+    "projects": {
+        "counting_1773284829": {
+            "path": "Output\\temp_projects\\counting_1773284829",
+            "updated_at": "2026-03-12T03:07:39.857092Z",
+            "render_mode": "full",
+            "video_file": "counting_1773284829.mp4",
+            "duration_seconds": 15.5,
+            "slide_count": 10,
+            "status": "ready"
+        },
+        "counting_1773285575": {
+            "path": "Output\\temp_projects\\counting_1773285575",
+            "updated_at": "2026-03-12T03:19:58.181636Z",
+            "render_mode": "full",
+            "video_file": "counting_1773285575.mp4",
+            "duration_seconds": 15.5,
+            "slide_count": 10,
+            "status": "ready"
+        },
+        "counting_1773328462": {
+            "path": "Output\\temp_projects\\counting_1773328462",
+            "updated_at": "2026-03-12T15:14:41.440895Z",
+            "render_mode": "full",
+            "video_file": "counting_1773328462.mp4",
+            "duration_seconds": 7.22,
+            "slide_count": 2,
+            "status": "ready"
+        },
+        "counting_1773330598": {
+            "path": "Output\\temp_projects\\counting_1773330598",
+            "updated_at": "2026-03-12T15:50:46.503265Z",
+            "render_mode": "full",
+            "video_file": "counting_1773330598.mp4",
+            "duration_seconds": 35.98,
+            "slide_count": 21,
+            "status": "ready"
+        }
+    }
+}

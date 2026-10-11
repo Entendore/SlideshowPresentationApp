@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap');
+
+    body {
+      margin: 0;
+      height: 100vh;
+      background-color: #2b3e36;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Permanent Marker', cursive;
+    }
+
+    .board {
+      width: 90%;
+      height: 80%;
+      border: 10px solid #5d4037;
+      border-radius: 10px;
+      background: repeating-linear-gradient(45deg, #334433, #334433 10px, #2b3e36 10px, #2b3e36 20px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .content {
+      color: #eeeeee;
+      font-size: 30vh;
+      margin: 0;
+      text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="board">
+    <div class="content">{content}</div>
+  </div>
+</body>
+
+</html>

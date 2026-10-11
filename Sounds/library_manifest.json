@@ -1,0 +1,40 @@
+{
+    "projects": {
+        "words_1773362995": {
+            "path": "Output\\temp_projects\\words_1773362995",
+            "updated_at": "2026-03-13T00:51:42.433778Z",
+            "render_mode": "full",
+            "video_file": "words_1773362995.mp4",
+            "duration_seconds": 78.82,
+            "slide_count": 50,
+            "status": "ready"
+        },
+        "test_1773370186": {
+            "path": "Output\\temp_projects\\test_1773370186",
+            "updated_at": "2026-03-13T02:50:01.195619Z",
+            "render_mode": "full",
+            "video_file": "test_1773370186.mp4",
+            "duration_seconds": 25.99,
+            "slide_count": 3,
+            "status": "ready"
+        },
+        "words_1773370440": {
+            "path": "Output\\temp_projects\\words_1773370440",
+            "updated_at": "2026-03-13T02:55:54.797454Z",
+            "render_mode": "full",
+            "video_file": "words_1773370440.mp4",
+            "duration_seconds": 88.78,
+            "slide_count": 50,
+            "status": "ready"
+        },
+        "test_1773371447": {
+            "path": "Output\\temp_projects\\test_1773371447",
+            "updated_at": "2026-03-13T03:10:59.257920Z",
+            "render_mode": "full",
+            "video_file": "test_1773371447.mp4",
+            "duration_seconds": 25.99,
+            "slide_count": 3,
+            "status": "ready"
+        }
+    }
+}

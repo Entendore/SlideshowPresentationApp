@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Slide</title>
+  <style>
+    body {
+      background-color: #1e1e1e;
+      /* Dark Gray */
+      color: #ffffff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .container {
+      width: 90%;
+      text-align: center;
+      padding: 20px;
+    }
+
+    /* Optional: Slight adjustment for IPA color to ensure visibility on dark bg */
+    span[style*="color: #888"] {
+      color: #aaaaaa !important;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    {content}
+  </div>
+</body>
+
+</html>

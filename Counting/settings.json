@@ -1,0 +1,22 @@
+{
+    "width": 1280,
+    "height": 720,
+    "fps": 30,
+    "encoder": "auto",
+    "preset": "fast",
+    "transition_duration": 0.5,
+    "edge_voice": "en-US-GuyNeural",
+    "edge_tone": "general",
+    "tts_backend": "edge",
+    "azure_region": "eastus",
+    "azure_subscription_key": "",
+    "azure_voice": "en-US-GuyNeural",
+    "azure_style": "calm",
+    "azure_styledegree": 1.0,
+    "render_workers": 1,
+    "output_dir": "Output",
+    "render_mode": "full",
+    "enable_zoom": false,
+    "zoom_factor": 1.1,
+    "music_volume": 0.2
+}
